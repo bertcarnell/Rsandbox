@@ -1,0 +1,140 @@
+Rational Number Class
+========================================================
+
+```{r temp, echo=FALSE, eval=TRUE, results='hide'}
+read_chunk(file.path("C:","Users","carnellr","Documents","Repositories","RSandbox","rational","rational number class chunks.r"))
+```
+
+```{r setupchunk, echo=FALSE, eval=TRUE, results='hide', message=FALSE}
+```
+
+This document describes the S4 implementation of a rational number class in R.  
+A rational number is a real number which can be expressed as the quotient of two 
+integers.  In R, this is expressed as an S4 class with objects:
+
+```{r s4class, echo=TRUE, eval=TRUE}
+```
+The S4 class, `rational` has slots `numerator, denominator, and value` which
+are `integer, integer, and numeric`.  At construction time, the validation
+function is called to ensure that the object is created correctly.  When
+constructed, the `value` slot should be automatically populated from the 
+`numerator` and `denominator` slots, so a custom initialize method is required.
+
+```{r s4classInitialize, echo=TRUE, eval=TRUE, results='hide'}
+```
+
+Based on these definitions, a number of exceptions can be thrown depending
+on how the object is constructed.
+
+```{r test1, echo=TRUE, eval=TRUE}
+```
+
+# Constructor
+
+Next, we would like a generic method that allows the rational number to be
+created in a more natural manner, by typing `rational(n,d)` instead of
+`new("rational", n, d)`.  Creating a generic method allows one to create
+methods that have different signatures.
+
+```{r genericRational, echo=TRUE, eval=TRUE, results='hide'}
+```
+Now, signatures can be created for the `rational` method that allow for rational
+numbers to be created from combinations of `integers` and `numerics`.
+
+```{r methodsRational, echo=TRUE, eval=TRUE, results='hide'}
+```
+Tests verify the behavior:
+
+```{r test2, echo=TRUE, eval=TRUE}
+```
+# R Objects
+It is natural in R to have a `length` and `[` method for a data type.
+
+```{r length, echo=TRUE, eval=TRUE, results='hide'}
+```
+
+```{r test3, echo=TRUE, eval=TRUE}
+```
+# Accessor Methods
+
+In order to protect the objects as much as possible, it may be necessary to
+access the numerator and denominator of an existing object.  Use
+* `setNumerator(rational, numeric)`
+* `setDenominator(rational, numeric)`
+* `getNumerator(rational)`
+* `getDenominator(rational)`
+* `getValue(rational)`
+(Code is hidden due to its simplicity)
+
+```{r accessors, echo=FALSE, eval=TRUE, results='hide'}
+```
+
+```{r test4, echo=TRUE, eval=TRUE}
+```
+
+# Define S4 Group Generic Functions
+
+## Arith
+
+The `rational` class should define the S4 group generics.  For example, the
+`Arith` group contains `r getGroupMembers("Arith")`.  For these methods, either
+use the generic method for the arithmetic function with the numeric representation
+of the rational number and another numeric argument, or use custom defined
+functions for operations with rational numbers.
+
+```{r arith, echo=TRUE, eval=TRUE, results='hide'}
+```
+
+```{r loopmethods, echo=FALSE, eval=TRUE, results='hide'}
+```
+
+```{r foo, eval=TRUE, echo=TRUE, results='hide'}
+````
+
+```{r test5, echo=TRUE, eval=TRUE}
+```
+
+## Compare
+
+The compare generics are `r getGroupMembers("Compare")`
+
+```{r compare, echo=TRUE, eval=TRUE, results='hide'}
+```
+
+```{r test6, echo=TRUE, eval=TRUE}
+```
+
+## Math and Math2
+
+The Math generics are `r getGroupMembers("Math")` and 
+`r getGroupMembers("Math2")`.  Most `Math` functions use the `numeric` value,
+but some are designed to more accurate with a `rational` number.
+
+```{r math, echo=TRUE, eval=TRUE, results='hide'}
+```
+
+```{r test7, echo=TRUE, eval=TRUE}
+```
+
+## Summary
+
+The `Summary` generics are `r getGroupMembers("Summary")`
+
+```{r summary, echo=TRUE, eval=TRUE, results='hide'}
+```
+
+```{r test8, echo=TRUE, eval=TRUE}
+```
+
+## Display
+
+```{r display, echo=TRUE, eval=TRUE, results='hide', message=FALSE}
+```
+
+## Conversion
+
+```{r conversion, echo=TRUE, eval=TRUE, results='hide'}
+```
+
+```{r test9, echo=TRUE, eval=TRUE}
+```
