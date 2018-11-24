@@ -1,0 +1,189 @@
+Analysis of Violence in Literature
+========================================================
+
+Assumptions:
+* The data contained in **Emily Project.xlsx** comes from the FrequencyTable
+at the top of the sheet
+* The primary categories are **Verbal, Rape, PsycMan, Alpha, Beta, Murder,and Other**
+* The works are categorized as **chirs, lit, real, dime, and fan**
+* The data is summarized as counts of instances in each work
+* 0.05 will be used as the alpha value for significance
+
+The data is summarized as follows...
+
+```{r}
+require(xlsx)
+require(multcomp)
+
+fn <- file.path("c:","users","Rob","downloads","Emily Project.xlsx")
+file.exists(fn)
+
+X <- read.xlsx(fn, sheetIndex=2, rowIndex=1:18, colIndex=2:36)
+
+ind <- which(names(X) %in% c("Verbal.Bullying.Verbal.Aggression","Rape",
+                             "Psychological.Manipulation",
+                             "Alpha.Male.Partner","Beta.Male.Partner","Murder"))
+Y <- X[,ind]
+names(Y) <- c("Verbal","Rape","PsycMan","Alpha","Beta","Murder")
+colSums(Y)
+Y$Other <- rowSums(X[,-ind], na.rm=TRUE)
+
+categories <- as.factor(c("chris","chris","lit","lit","real","real","chris","chris","chris",
+                        "dime","real","fan","fan","dime","dime","lit","lit"))
+by(Y, categories, colSums)
+by(Y, categories, sum)
+sum(Y)
+```
+
+There are multiple possible hypotheses, but only a few should be chosen.
+
+## Test 1
+* H0: There is no difference between categories of book based on total counts of violence
+* H1: There are differences
+* Method: ANOVA
+* Result: p > 0.05, therefore the null hypothesis cannot be rejected and there are no
+significant differences between categories of book based on counts of violence. (Look at
+the Pr(>F) in the table)
+
+```{r}
+lm1 <- lm(rowSums(X, na.rm=TRUE) ~ categories)
+anova(lm1)
+```
+
+## Test 2
+* H0: There is no difference between categories of book based on counts of violence
+in each category of violence
+* H1: There are differences
+* Method: Multivariate response ANOVA (MANOVA)
+* Result: p > 0.05, therefore the null hypothesis cannot be rejected and there are no
+significant differences between categories of book based on counts of violence. (Look at
+the Pr(>F) in the table)
+
+```{r}
+m1 <- manova(as.matrix(Y) ~ categories)
+summary(m1)
+```
+
+## Test 3
+* H0: There is no difference between categories of book based on counts of violence
+in one category
+* H1: There are differences
+* Method: ANOVA
+
+#### Verbal
+* Result: p > 0.05, therefore the null hypothesis cannot be rejected and there are no
+significant differences between categories of book based on counts of violence. (Look at
+the Pr(>F) in the table)
+
+```{r}
+lmv <- lm(Y$Verbal ~ categories)
+anova(lmv)
+```
+#### Rpe
+* Result: p > 0.05, therefore the null hypothesis cannot be rejected and there are no
+significant differences between categories of book based on counts of violence. (Look at
+the Pr(>F) in the table)
+
+```{r}
+lmr <- lm(Y$Rape ~ categories)
+anova(lmr)
+```
+
+#### Psychological Manipulation
+* Result: p < 0.05, therefore the null hypothesis can be rejected.  There is at least
+one significant difference between categories of book based on counts of violence. (Look at
+the Pr(>F) in the table)
+
+```{r}
+lmp <- lm(Y$PsycMan ~ categories)
+anova(lmp)
+```
+
+* The significant result is between the lit and chris categories.  The lit category
+is siginifantly more violent than the chris category.  Note that the p-values in
+these multiple comparisons are adjusted such that the overall error rate is still
+0.05.
+
+```{r}
+lmp.mc <- glht(lmp, linfct=mcp(categories="Tukey"))
+summary(lmp.mc, test=adjusted(type="holm"))
+```
+
+#### Alpha Male
+* Result: p > 0.05, therefore the null hypothesis cannot be rejected and there are no
+significant differences between categories of book based on counts of violence. (Look at
+the Pr(>F) in the table)
+
+```{r}
+lma <- lm(Y$Alpha ~ categories)
+anova(lma)
+```
+
+#### Beta Male
+* Result: p < 0.05, therefore the null hypothesis can be rejected.  There is at least
+one significant difference between categories of book based on counts of violence. (Look at
+the Pr(>F) in the table)
+
+```{r}
+lmb <- lm(Y$Beta ~ categories)
+anova(lmb)
+```
+
+* The significant result is between the lit and fan categories.  The lit category
+is siginifantly more violent than the fan category.  Note that the p-values in
+these multiple comparisons are adjusted such that the overall error rate is still
+0.05.
+
+```{r}
+lmb.mc <- glht(lmb, linfct=mcp(categories="Tukey"))
+summary(lmb.mc, test=adjusted(type="holm"))
+```
+
+#### Murder
+* Result: p > 0.05, therefore the null hypothesis cannot be rejected and there are no
+significant differences between categories of book based on counts of violence. (Look at
+the Pr(>F) in the table)
+
+```{r}
+lmm <- lm(Y$Murder ~ categories)
+anova(lmm)
+```
+
+#### Other types of violence
+* Result: p > 0.05, therefore the null hypothesis cannot be rejected and there are no
+significant differences between categories of book based on counts of violence. (Look at
+the Pr(>F) in the table)
+
+```{r}
+lmo <- lm(Y$Other ~ categories)
+anova(lmo)
+```
+
+## Alternate Tests
+
+As a side note, one of the most important assumptions of an ANOVA is that the
+data is normally distributed.  This is a difficult assumption to meet when 
+the data are counts and they are bounded by zero on the lower side.  Since your
+professor suggested an ANOVA, that test is provided.  I would have done the
+distribution-free test called Kruskal-Wallis instead.  On the down side, however,
+the Kruskal-Wallis test shows no significant differences.
+
+```{r}
+kvtotal <- kruskal.test(rowSums(Y, na.rm=TRUE) ~ categories)
+kvtotal
+kv <- kruskal.test(Y$Verbal ~ categories)
+kv
+kr <- kruskal.test(Y$Rape ~ categories)
+kr
+kp <- kruskal.test(Y$PsycMan ~ categories)
+kp
+ka <- kruskal.test(Y$Alpha ~ categories)
+ka
+kb <- kruskal.test(Y$Beta ~ categories)
+kb
+km <- kruskal.test(Y$Murder ~ categories)
+km
+ko <- kruskal.test(Y$Other ~ categories)
+ko
+```
+

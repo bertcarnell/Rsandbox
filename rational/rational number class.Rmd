@@ -2,7 +2,7 @@ Rational Number Class
 ========================================================
 
 ```{r temp, echo=FALSE, eval=TRUE, results='hide'}
-read_chunk(file.path("C:","Users","carnellr","Documents","Repositories","RSandbox","rational","rational number class chunks.r"))
+read_chunk(file.path("C:","Users","Rob","Documents","Repositories","RSandbox","rational","rational number class chunks.r"))
 ```
 
 ```{r setupchunk, echo=FALSE, eval=TRUE, results='hide', message=FALSE}
@@ -64,6 +64,7 @@ access the numerator and denominator of an existing object.  Use
 * `getNumerator(rational)`
 * `getDenominator(rational)`
 * `getValue(rational)`
+
 (Code is hidden due to its simplicity)
 
 ```{r accessors, echo=FALSE, eval=TRUE, results='hide'}
